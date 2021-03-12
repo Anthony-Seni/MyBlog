@@ -1,0 +1,20 @@
+<%- include('header')-%>
+
+<%- include('topNav')-%>
+
+<div class="container">
+    <div class="airtimeRecharge-form">
+     <form method="POST" action="/admin/save_settings">
+       <div class="form-group">
+         <label>Post limit</label>
+         <input name="post_limit" class="form-control">
+       </div>
+
+       <input type="submit" class="btn btn-info" value="Save settings">
+
+     </form>
+
+    </div>
+</div>
+
+<%- include('footer')-%>

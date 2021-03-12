@@ -1,0 +1,238 @@
+<%- include('header')-%>
+
+  <body>
+
+    <!-- Navigation -->
+    <%- include('topNav')-%>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Post Content Column -->
+        <div class="col-lg-8">
+
+          <!-- Title -->
+          <h1 class="mt-4"><%= post.title %></h1>
+
+          
+          <hr>
+
+         
+
+          <hr>
+
+          <!-- Preview Image -->
+          <% if (post.image) { %>
+            <img class="card-img-top" src="<%= post.image %>" alt="Card image cap">
+          <% } else { %>
+            <img class="card-img-top" src="http://placehold.it/750x300" alt="Card image cap">  
+          <% } %>
+          
+
+          <hr>
+
+          <!-- Post Content -->
+          <p class="lead"><%- post.content %></p>
+          <hr>
+
+          <!-- Comments Form -->
+          <div class="card my-4">
+            <h5 class="card-header">Leave a Comment:</h5>
+            <div class="card-body">
+              <form method="POST" onsubmit="return doComment(this);">
+               <input type="hidden" id= "post_id" name="post_id" value="<%= post._id %>"/>
+
+                <div class="form-group">
+                  <input class="form-control" name= "username" placeholder="username">
+                </div>
+
+                <div class="form-group">
+                  <input class="form-control" name= "email" placeholder="Email">
+                </div>
+
+                <div class="form-group">
+                  <textarea class="form-control" name="comment" placeholder="comment"  rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+            </div>
+          </div>
+
+          <script>
+
+               var socket = io();
+
+                function doComment(form) {
+
+                var formData = {username: form.username.value, comment: form.comment.value, post_id: form.post_id.value, email: form.email.value}
+
+                $.ajax({
+                url: "/do-comment",
+                method: "POST",
+                data: formData,
+                success: function (response) {
+                  formData._id = response._id;
+                  
+                  socket.emit("new_comment", formData);
+
+
+                  alert(response.text)
+                }
+              });
+              return false;
+             }
+                
+             socket.on("new_comment", function (comment) {
+               if (comment.post_id != $("#post_id").val()) {
+                 return;
+               }
+
+
+                var html = "";
+                    html +=  '<div class="media mb-4">';
+                    html +=  '<img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">';
+                    html +=  '<div class="media-body">';
+                    html +=  '<h5 class="mt-0">';  
+                    html +=  comment.username;
+                    html +=  '</h5>';
+                    html +=  comment.comment;
+                    html +=  '</div>';
+                    html +=  '</div>';
+
+                    $("#comments").prepend(html);
+             });
+
+             socket.on("new_reply", function (reply) {
+               var html = "";
+
+                html += '<div class="media mb-4">';
+                html += '<img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">';
+                html += '<div class="media-body">';
+                html += '<h5 class="mt-0">';
+                html +=  reply.name;
+                html += '</h5>';
+                html +=  reply.reply;
+                html += '</div>';
+                html += '</div>';
+               
+               $("#replies-" + reply.comment_id).append(html);
+             });
+
+             function doReply(form) {
+               var formData = {
+                  post_id: form.post_id.value,
+                  comment_id: form.comment_id.value,
+                  name: form.name.value,
+                  reply: form.reply.value,
+                  comment_email: form.comment_email.value
+               };
+
+               $.ajax ({
+                 url: "/do-reply",
+                 method: "POST",
+                 data: formData,
+                 success: function (response) {
+                   formData._id = response._id;
+                   socket.emit("new_reply", formData);
+
+                   form.name.value = "";
+                   form.reply.value = "";
+
+                 alert(response.text);
+                 }
+               });
+
+               return false;
+             }
+          </script>
+
+          <!-- Single Comment -->
+          <div id="comments">
+          <% if (post.comments) { %>
+          <% post.comments = post.comments.reverse(); %>
+          <% post.comments.forEach(function (comment) { %>
+          <div class="media mb-4">
+            <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+            <div class="media-body">
+              <h5 class="mt-0">  
+                 <%= comment.username %>
+              
+              </h5>
+              <%= comment.comment %>
+               
+              <div id="replies-<%= comment._id %>">
+
+
+               <% if (comment.replies) { %>
+                <% comment.replies.forEach(function (reply) { %>   
+                  
+                   <div class="media mb-4">
+                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+
+                    <div class="media-body">
+                      <h5 class="mt-0">
+                        <%= reply.name %>
+                      </h5>
+
+                      <%= reply.reply %>
+                    </div>
+                   </div>
+
+                  <% }); %>
+                <% } %> 
+
+              </div>
+
+              <div class="col-md-3">
+                <form onsubmit="return doReply(this);">
+                 <input name="post_id" type="hidden" value="<%= post._id %>">
+                 <input name="comment_id" type="hidden" value="<%= comment._id %>">
+                 <input name="comment_email" type="hidden" value="<%= comment.email %>">
+                   <div class="form-group">
+                     <input name="name" class="form-control" placeholder="Enter name">
+                   </div>
+
+                   <div class="form-group">
+                    <textarea name="reply" class="form-control" placeholder="Enter reply"></textarea>
+                  </div>
+
+                  <input type="submit" class="btn btn-info btn-sm" value="Reply">
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <% }); %>
+          <% } %>
+          </div>
+
+        </div>
+
+        <!-- Sidebar Widgets Column -->
+        <div class="col-md-4">
+
+          
+
+          <!-- Categories Widget -->
+          
+
+            <a class="twitter-timeline" data-width="400" data-height="300" href="https://twitter.com/seni25tech?ref_src=twsrc%5Etfw">Tweets by seni25tech</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+          
+
+          
+          
+
+        </div>
+        
+        
+
+      </div>
+      <!-- /.row -->
+
+    </div>
+    <!-- /.container -->
+    
+
+    <%- include('footer')-%>

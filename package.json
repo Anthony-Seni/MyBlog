@@ -1,0 +1,24 @@
+{
+  "name": "25bl",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "author": "Seni",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "formidable": "^1.2.2",
+    "mongodb": "^3.6.4",
+    "mongoose": "^5.11.18",
+    "nodemailer": "^6.5.0",
+    "nodemon": "^2.0.7",
+    "socket.io": "^3.1.2"
+  },
+  "devDependencies": {},
+  "description": ""
+}

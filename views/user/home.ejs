@@ -1,0 +1,139 @@
+<%- include('header')-%>
+  <body>
+
+    <!-- Navigation -->
+    <%- include('topNav')-%>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-8">
+
+          <h1 class="my-4"> 25 Tech...
+            <small>Everything Tech</small>
+          </h1>
+          <!-- Blog Post -->
+          <div id="posts">
+           <% posts.forEach(function(post){ %>
+            <div class="card mb-4" id="post-<%= post._id %>">
+             
+              <% if (post.image) { %>
+              <img class="card-img-top" src="<%= post.image %>" alt="">
+              <% } else { %>
+              <img class="card-img-top" src="http://placehold.it/750x300" alt="">  
+              <% } %>
+             
+            <div class="card-body">
+              <h2 class="card-title">
+                  <%= post.title %>
+              </h2>
+              <p class="card-text">
+                  <%- post.content %>
+              </p>
+              <a href="posts/<%= post._id %>" class="btn btn-primary">Read more &rarr;</a>
+            </div>
+           
+           </div>
+           <% }); %>
+          
+          </div>
+
+         
+
+        </div>
+
+        
+        <div class="col-md-4">
+          <a class="twitter-timeline" data-width="400" data-height="300" href="https://twitter.com/seni25tech?ref_src=twsrc%5Etfw">Tweets by seni25tech</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        </div>
+        
+
+      </div>
+      <!-- /.row -->
+      
+
+    </div>
+    <!-- /.container -->
+
+   <script>
+
+     var start = 0;
+     var limit = <%= postLimit %>
+
+     function getNext () {
+        start = start + limit;
+
+         $.ajax({
+           url: "/get-posts/" + start + "/" + limit,
+           method: "GET",
+           success: function (response) {
+            console.log(response)  
+           }
+         });
+     }
+
+   
+     function renderPosts(Posts) {
+      if (posts.length > 0) {
+        var html = "";
+
+
+        for (var a = 0; a < posts.length; a++) {
+
+
+        html +=  '<div class="card mb-4" id="post-' + posts[a]._id  + '">';
+        html +=  '<img class="card-img-top" src="' + posts[a].image +  '" alt="">';
+        html +=  '<div class="card-body">';
+        html +=  '<h2 class="card-title">';
+        html +=   posts[a].title;
+        html +=  '</h2>';
+        html +=  '<p class="card-text">';
+        html +=   posts[a].content;
+        html +=  '</p>';
+        html +=  '<a href="posts/' + post[a]._id +  '" class="btn btn-primary">Read More &rarr;</a>';
+        html +=  '</div>';
+        html +=  '</div>';
+          
+        }
+
+
+        $("#posts").html(html);
+      }
+    }
+
+    
+     var socket = io();
+     
+     socket.on("delete_post", function (replyId) {
+          document.getElementById("post-" + replyId).remove();
+     });
+
+
+     socket.on("new_post", function (formData) {
+      var html = "";
+              html += '<div class="card mb-4">';
+              html += '<img class="card-img-top" src="' + formData.image + '"  alt="Card image cap">';
+              html += '<div class="card-body">';
+              html += '<h2 class="card-title">';
+              html +=  formData.title;
+              html += '</h2>';
+              html += '<p class="card-text">';
+              html +=  formData.content;
+              html += '</p>';
+              html += '<a href="posts/' + formData._id + '" class="btn btn-primary">Read More &rarr;</a>';
+              html += '</div>';
+              html += '</div>';
+
+             $("#posts").prepend(html);
+     });
+   </script>
+
+
+
+
+   
+    
+    <%- include('footer')-%>
