@@ -32,7 +32,7 @@ app.use(bodyParser.json());
 
 
 const MongoClient = require("mongodb").MongoClient;
-MongoClient.connect("mongodb://localhost:27017", {useNewUrlParser: true}, function (error, 
+MongoClient.connect("mongodb://localhost:27017/25bl", {useNewUrlParser: true}, function (error, 
 client) {
     const blog = client.db("blog");
     console.log("DB connected");
@@ -304,7 +304,7 @@ app.get("/", function (req, res) {
  });
 
  http.listen(port, function (req, res) {
-    console.log("connected");
+    console.log(`app running on port ${port}...`);
  });
 
 
