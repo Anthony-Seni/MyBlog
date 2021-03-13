@@ -34,13 +34,13 @@ app.use(bodyParser.json());
 
 
 const MongoClient = require("mongodb").MongoClient;
-MongoClient.connect(mongoDbURL, {useNewUrlParser: true}, {useUnifiedTopology: true},function (error, 
+MongoClient.connect(process.env.DB_CONNECTION, {useNewUrlParser: true}, {useUnifiedTopology: true},function (error, 
 client) {
     const blog = client.db("blog");
     console.log("DB connected");
 
     app.post("/do-delete", function(req, res) {
-       //  if (req.session.admin) {
+        if (req.session.admin) {
             
              fs.unlink(req.body.image.replace("/", ""), function(error) {
 
@@ -53,9 +53,9 @@ client) {
              
              });
 
-       //  } else {
-            // res.redirect("/admin");
-       //  }
+        } else {
+            res.redirect("/admin");
+       }
     });
 
     app.get("/admin/settings", function (req, res) {
