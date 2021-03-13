@@ -34,9 +34,9 @@ app.use(bodyParser.json());
 
 
 const MongoClient = require("mongodb").MongoClient;
-MongoClient.connect(process.env.DB_CONNECTION, {useNewUrlParser: true}, {useUnifiedTopology: true},function (error, 
+MongoClient.connect(process.env.DB_CONNECTION, {useNewUrlParser: true, useUnifiedTopology: true},function (error, 
 client) {
-    const blog = client.db("blog");
+    var blog = client.db("blog");
     console.log("DB connected");
 
     app.post("/do-delete", function(req, res) {
