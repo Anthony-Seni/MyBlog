@@ -4,7 +4,8 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser")
 var ObjectId = require("mongodb").ObjectId;
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3000;
+const mongoDbURL = process.env.MONGODB_URL || "mongodb://localhost:27017/25bl"
 
 
 var http = require("http").createServer(app);
@@ -33,7 +34,7 @@ app.use(bodyParser.json());
 
 
 const MongoClient = require("mongodb").MongoClient;
-MongoClient.connect("mongodb://localhost:27017/25bl", {useNewUrlParser: true}, function (error, 
+MongoClient.connect(mongoDbURL, {useNewUrlParser: true}, {useUnifiedTopology: true},function (error, 
 client) {
     const blog = client.db("blog");
     console.log("DB connected");
