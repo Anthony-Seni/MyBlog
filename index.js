@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser")
 var ObjectId = require("mongodb").ObjectId;
+const port = process.env.PORT || 3000
 
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
@@ -302,7 +303,7 @@ app.get("/", function (req, res) {
 
  });
 
- http.listen(3000, function (req, res) {
+ http.listen(port, function (req, res) {
     console.log("connected");
  });
 
